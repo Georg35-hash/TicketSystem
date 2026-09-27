@@ -449,6 +449,26 @@
         gap: 8px;
         margin-top: auto;
       }
+      .ticket-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 2px;
+      }
+      .forget-button {
+        min-width: 0;
+        min-height: 40px;
+        padding: 6px 10px;
+        border: 1px solid var(--card-edge);
+        border-radius: 2px;
+        background: transparent;
+        color: var(--ink-soft);
+        font-size: 11px;
+        cursor: pointer;
+      }
+      .forget-button:hover {
+        border-color: var(--stamp-red);
+        color: var(--stamp-red);
+      }
       .ticket-details {
         display: flex;
         min-width: 0;
@@ -862,6 +882,7 @@
 
         function createTicketCard(ticket, allowStatusChange) {
           var card = makeElement("article", "ticket-card");
+          card.dataset.ticketId = ticket.id;
           var top = makeElement("div", "ticket-card-top");
           top.appendChild(makeElement("span", "ticket-number", ticket.ticketNumber));
           top.appendChild(makeElement("span", "status-badge status-" + ticket.status, getStatus(ticket.status).label));
@@ -899,7 +920,28 @@
             footer.appendChild(makeElement("span", "age", ageLabel(ticket.createdAt)));
           }
           card.appendChild(footer);
+          var actions = makeElement("div", "ticket-actions");
+          var forgetButton = makeElement("button", "forget-button", "Vergessen");
+          forgetButton.type = "button";
+          forgetButton.setAttribute("aria-label", "Ticket " + ticket.ticketNumber + " vergessen");
+          forgetButton.addEventListener("click", function () { forgetTicket(ticket.id); });
+          actions.appendChild(forgetButton);
+          card.appendChild(actions);
           return card;
+        }
+
+        function forgetTicket(ticketId) {
+          if (!window.confirm("Ticket wirklich vergessen? Dieser Vorgang lässt sich nicht zurückholen.")) return;
+          var remaining = tickets.filter(function (ticket) { return ticket.id !== ticketId; });
+          if (!saveToStorage(remaining)) return;
+          renderTickets();
+          filterTickets();
+          var result = document.getElementById("status-result");
+          var resultCard = result.querySelector("[data-ticket-id]");
+          if (resultCard && resultCard.dataset.ticketId === ticketId) {
+            renderStatusResult(null);
+          }
+          showToast("Ticket erfolgreich vergessen.");
         }
 
         function ageLabel(timestamp) {
