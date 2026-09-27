@@ -2,917 +2,1109 @@
 <html lang="de">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#cbb583" />
     <title>TICKET-ABLAGE · Amt für Zurückhaltende Reaktionen</title>
     <style>
       :root {
+        color-scheme: light dark;
         --paper: #dcc99a;
         --paper-dark: #cbb583;
         --card: #f2e7c9;
         --card-edge: #d8c79a;
         --ink: #2b2116;
-        --ink-soft: #5a4d38;
+        --ink-soft: #51452f;
         --stamp-red: #a6342b;
         --stamp-teal: #2f6b5e;
-        --stamp-grey: #6b6255;
+        --stamp-amber: #704a0b;
         --line: #b8a47c;
-        --shadow: rgba(43, 33, 22, 0.28);
-        --focus: #1f5f8b;
-      }
-      :root:not([data-theme="light"]) {
+        --shadow: rgba(43, 33, 22, 0.24);
+        --focus: #145783;
+        --control-height: 44px;
       }
       @media (prefers-color-scheme: dark) {
-        :root:not([data-theme="light"]) {
+        :root {
           --paper: #3a2f22;
           --paper-dark: #2e251a;
           --card: #4a3c2a;
           --card-edge: #5c4b33;
           --ink: #ecdfc4;
-          --ink-soft: #c9b78e;
-          --line: #6b5a3e;
-          --shadow: rgba(0, 0, 0, 0.5);
+          --ink-soft: #d1c29f;
+          --stamp-red: #ff9387;
+          --stamp-teal: #80c5ac;
+          --stamp-amber: #e5bd64;
+          --line: #806b47;
+          --shadow: rgba(0, 0, 0, 0.45);
+          --focus: #8bc6ec;
         }
       }
-      :root[data-theme="dark"] {
-        --paper: #3a2f22;
-        --paper-dark: #2e251a;
-        --card: #4a3c2a;
-        --card-edge: #5c4b33;
-        --ink: #ecdfc4;
-        --ink-soft: #c9b78e;
-        --line: #6b5a3e;
-        --shadow: rgba(0, 0, 0, 0.5);
-      }
-
-      * {
+      *,
+      *::before,
+      *::after {
         box-sizing: border-box;
       }
       html {
-        scroll-padding-top: env(safe-area-inset-top, 0px);
-        scroll-behavior: stable;
-      }
-      body {
-        margin: 0;
         min-height: 100%;
-        background:
-          radial-gradient(
-            1200px 600px at 10% -10%,
-            rgba(255, 255, 255, 0.06),
-            transparent
-          ),
-          var(--paper-dark);
-        color: var(--ink);
-        font-family: "Courier New", Courier, monospace;
-        padding-top: env(safe-area-inset-top, 0px);
-        padding-bottom: env(safe-area-inset-bottom, 0px);
+        scroll-behavior: smooth;
       }
-      html,
       body {
-        height: 100%;
+        min-width: 0;
+        min-height: 100vh;
+        margin: 0;
+        padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px);
+        overflow-x: hidden;
+        color: var(--ink);
+        background:
+          repeating-linear-gradient(0deg, transparent 0 31px, rgba(43, 33, 22, 0.035) 32px),
+          radial-gradient(1000px 500px at 8% 0%, rgba(255, 255, 255, 0.12), transparent 70%),
+          var(--paper-dark);
+        font-family: "Courier New", Courier, monospace;
       }
-
+      button,
+      input,
+      textarea,
+      select {
+        max-width: 100%;
+        font: inherit;
+      }
+      :focus-visible {
+        outline: 3px solid var(--focus);
+        outline-offset: 2px;
+      }
       .wrap {
+        width: 100%;
         max-width: 1180px;
+        min-width: 0;
         margin: 0 auto;
-        padding: 28px 20px 60px;
+        padding: 26px 20px 56px;
       }
-
-      /* ---------- Header ---------- */
-      header {
-        background: var(--paper);
+      .site-header {
+        position: relative;
+        min-width: 0;
+        padding: 23px 24px 20px;
         border: 1px solid var(--card-edge);
         border-radius: 2px;
-        padding: 22px 24px;
-        position: relative;
+        background: var(--paper);
+        background-image: repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(43, 33, 22, 0.045) 28px);
         box-shadow: 0 10px 24px var(--shadow);
-        background-image: repeating-linear-gradient(
-          0deg,
-          transparent,
-          transparent 27px,
-          rgba(43, 33, 22, 0.05) 28px
-        );
       }
-      header::before {
-        content: "AKTE Nr. 0042";
+      .site-header::before {
         position: absolute;
         top: -11px;
         left: 24px;
-        background: var(--card);
-        border: 1px solid var(--card-edge);
         padding: 2px 10px;
-        font-size: 11px;
-        letter-spacing: 0.08em;
-        color: var(--ink-soft);
+        content: "AKTE Nr. 0042";
+        border: 1px solid var(--card-edge);
         border-radius: 2px;
+        background: var(--card);
+        color: var(--ink-soft);
+        font-size: 11px;
       }
       h1 {
-        margin: 6px 0 4px;
-        font-size: clamp(24px, 4vw, 34px);
+        margin: 5px 0 4px;
+        font-size: clamp(26px, 4vw, 34px);
         line-height: 1.15;
-        font-weight: 700;
-        letter-spacing: 0.01em;
       }
-      .subtitle {
+      .subtitle,
+      .page-intro {
+        max-width: 70ch;
+        margin: 0 0 14px;
         color: var(--ink-soft);
-        font-size: 14px;
-        margin: 0 0 16px;
+        font-size: 13px;
+        line-height: 1.5;
       }
-      .stats {
+      .site-nav {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 6px;
+        gap: 8px;
+        margin-top: 15px;
+      }
+      .nav-button {
+        min-width: 0;
+        min-height: 42px;
+        padding: 8px 12px;
+        border: 1px solid var(--line);
+        border-radius: 2px;
+        background: transparent;
+        color: var(--ink);
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .nav-button[aria-current="page"],
+      .nav-button:hover {
+        background: var(--ink);
+        color: var(--card);
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr));
+        gap: 9px;
+        margin-top: 14px;
       }
       .stat {
+        min-width: 0;
+        padding: 7px 11px;
         border: 1px dashed var(--line);
-        padding: 8px 12px;
-        border-radius: 2px;
-        font-size: 12.5px;
         background: rgba(255, 255, 255, 0.06);
+        font-size: 12px;
+        overflow-wrap: anywhere;
       }
       .stat b {
         display: block;
-        font-size: 17px;
         margin-bottom: 2px;
+        font-size: 17px;
       }
-
-      .stamp {
-        position: absolute;
-        top: 14px;
-        right: 18px;
-        border: 3px solid var(--stamp-red);
-        color: var(--stamp-red);
-        padding: 6px 14px;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        font-size: 13px;
-        transform: rotate(-8deg);
-        border-radius: 6px;
-        opacity: 0.85;
-        user-select: none;
-        pointer-events: none;
+      .view {
+        min-width: 0;
+        margin-top: 20px;
       }
-      @media (max-width: 640px) {
-        .stamp {
-          position: static;
-          display: inline-block;
-          margin-top: 10px;
-          transform: rotate(-4deg);
-        }
+      .view[hidden] {
+        display: none !important;
       }
-
-      /* ---------- Layout ---------- */
       .layout {
         display: grid;
-        grid-template-columns: 300px 1fr;
+        grid-template-columns: minmax(250px, 300px) minmax(0, 1fr);
         gap: 20px;
-        margin-top: 20px;
         align-items: start;
       }
-      @media (max-width: 860px) {
-        .layout {
-          grid-template-columns: 1fr;
-        }
+      .layout > section {
+        min-width: 0;
       }
-
-      /* ---------- Form ---------- */
-      .form-panel {
-        background: var(--paper);
+      .form-panel,
+      .filter-panel,
+      .lookup-panel {
+        min-width: 0;
+        padding: 18px;
         border: 1px solid var(--card-edge);
         border-radius: 2px;
-        padding: 18px;
-        position: sticky;
-        top: 16px;
+        background: var(--paper);
         box-shadow: 0 8px 18px var(--shadow);
       }
-      .form-panel h2 {
+      .form-panel {
+        position: sticky;
+        top: 14px;
+      }
+      .form-panel h2,
+      .filter-panel h2,
+      .lookup-panel h2 {
         margin: 0 0 4px;
         font-size: 16px;
       }
-      .form-panel .hint {
-        font-size: 12px;
-        color: var(--ink-soft);
+      .hint {
         margin: 0 0 14px;
+        color: var(--ink-soft);
+        font-size: 12px;
+        line-height: 1.5;
       }
       label {
         display: block;
-        font-size: 12px;
-        color: var(--ink-soft);
         margin: 12px 0 4px;
+        color: var(--ink-soft);
+        font-size: 12px;
+        font-weight: 700;
       }
       input[type="text"],
       textarea,
       select {
+        display: block;
         width: 100%;
-        background: var(--card);
+        min-width: 0;
+        min-height: var(--control-height);
+        padding: 9px 10px;
         border: 1px solid var(--card-edge);
         border-bottom: 1px dashed var(--line);
-        color: var(--ink);
-        font-family: inherit;
-        font-size: 13.5px;
-        padding: 8px 9px;
         border-radius: 2px;
-      }
-      input[type="text"]:focus,
-      textarea:focus,
-      select:focus {
-        outline: 2px solid var(--focus);
-        outline-offset: 1px;
+        background: var(--card);
+        color: var(--ink);
+        font-size: 14px;
       }
       textarea {
+        min-height: 92px;
         resize: vertical;
-        min-height: 64px;
       }
-
-      .submit-btn {
-        margin-top: 16px;
-        width: 100%;
-        background: var(--stamp-teal);
-        color: #f2e7c9;
-        border: none;
-        padding: 11px;
-        font-family: inherit;
-        font-weight: 700;
-        letter-spacing: 0.03em;
-        font-size: 13.5px;
-        border-radius: 3px;
-        cursor: pointer;
-        box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+      [aria-invalid="true"] {
+        border-color: var(--stamp-red) !important;
       }
-      .submit-btn:active {
-        transform: translateY(2px);
-        box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
-      }
-      .submit-btn:focus-visible {
-        outline: 2px solid var(--focus);
-        outline-offset: 2px;
-      }
-
-      .grumble {
-        margin-top: 10px;
+      .field-error {
+        margin: 4px 0 0;
+        color: var(--stamp-red);
         font-size: 11px;
-        color: var(--ink-soft);
-        text-align: center;
-      }
-
-      /* ---------- Board ---------- */
-      .board {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(230px, 1fr));
-        gap: 14px;
-        overflow-x: auto;
-        padding-bottom: 6px;
-      }
-      @media (max-width: 860px) {
-        .board {
-          grid-template-columns: 1fr;
-          overflow-x: visible;
-        }
-      }
-
-      .column {
-        background: rgba(0, 0, 0, 0.05);
-        border: 1px solid var(--card-edge);
-        border-radius: 3px;
-        min-height: 120px;
-        display: flex;
-        flex-direction: column;
-      }
-      .column-head {
-        padding: 10px 12px;
-        border-bottom: 1px solid var(--card-edge);
-        font-size: 12.5px;
-        font-weight: 700;
-        letter-spacing: 0.02em;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .column-head .count {
-        font-weight: 400;
-        color: var(--ink-soft);
-        font-size: 11px;
-      }
-      .column-body {
-        padding: 10px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        flex: 1;
-      }
-      .empty-note {
-        font-size: 11.5px;
-        color: var(--ink-soft);
-        text-align: center;
-        padding: 14px 6px;
-        font-style: italic;
-      }
-
-      /* ---------- Ticket card ---------- */
-      .ticket {
-        background: var(--card);
-        border: 1px solid var(--card-edge);
-        border-radius: 2px;
-        padding: 11px 12px 10px;
-        position: relative;
-        box-shadow: 0 3px 8px var(--shadow);
-        animation: drop 0.35s ease;
-      }
-      @keyframes drop {
-        from {
-          opacity: 0;
-          transform: translateY(-6px) rotate(-1deg);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0) rotate(0);
-        }
-      }
-      .ticket::before {
-        content: "";
-        position: absolute;
-        top: 6px;
-        left: 6px;
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: rgba(0, 0, 0, 0.15);
-        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
-      }
-      .ticket-title {
-        font-weight: 700;
-        font-size: 13.5px;
-        margin: 0 0 4px 10px;
-        line-height: 1.3;
-      }
-      .ticket-desc {
-        font-size: 12px;
-        color: var(--ink-soft);
-        margin: 0 0 8px 10px;
         line-height: 1.4;
       }
-      .ticket-meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 5px;
-        margin: 0 0 8px 10px;
+      .field-error:empty {
+        display: none;
       }
-      .tag {
-        font-size: 10px;
-        padding: 2px 6px;
-        border-radius: 10px;
-        border: 1px solid var(--card-edge);
-        color: var(--ink-soft);
-        background: rgba(0, 0, 0, 0.04);
-      }
-      .tag.prio-hoch {
-        color: var(--stamp-red);
-        border-color: var(--stamp-red);
-      }
-      .tag.prio-mittel {
-        color: #8a6b1e;
-        border-color: #8a6b1e;
-      }
-      .tag.prio-niedrig {
-        color: var(--stamp-teal);
-        border-color: var(--stamp-teal);
-      }
-
-      .ticket-foot {
-        display: flex;
-        justify-content: space-between;
+      .primary-btn {
+        display: inline-flex;
+        min-width: 0;
+        min-height: var(--control-height);
         align-items: center;
-        margin-left: 10px;
-        gap: 6px;
-      }
-      .reporter {
-        font-size: 10.5px;
-        color: var(--ink-soft);
-      }
-      .ticket-actions {
-        display: flex;
-        gap: 4px;
-      }
-      .ticket-actions button {
-        font-family: inherit;
-        font-size: 10.5px;
-        background: transparent;
-        border: 1px solid var(--card-edge);
-        color: var(--ink-soft);
-        padding: 3px 6px;
-        border-radius: 2px;
-        cursor: pointer;
-      }
-      .ticket-actions button:hover {
-        border-color: var(--ink-soft);
-        color: var(--ink);
-      }
-      .ticket-actions button:focus-visible {
-        outline: 2px solid var(--focus);
-      }
-
-      .age {
-        display: inline-block;
-        margin-top: 2px;
-        font-size: 10px;
-        color: var(--ink-soft);
-      }
-      .age.old {
-        color: var(--stamp-red);
+        justify-content: center;
+        padding: 10px 14px;
+        border: 0;
+        border-radius: 3px;
+        background: var(--stamp-teal);
+        color: #fff8e9;
         font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
       }
-
-      footer {
-        margin-top: 26px;
+      .primary-btn:disabled {
+        opacity: 0.65;
+        cursor: wait;
+      }
+      .submit-btn {
+        width: 100%;
+        margin-top: 16px;
+      }
+      .grumble {
+        margin: 10px 0 0;
+        color: var(--ink-soft);
         text-align: center;
         font-size: 11px;
-        color: var(--ink-soft);
+        line-height: 1.5;
       }
-
+      .confirmation {
+        margin: 12px 0 0;
+        padding: 10px;
+        border-left: 3px solid var(--stamp-teal);
+        background: rgba(47, 107, 94, 0.12);
+        font-size: 13px;
+        line-height: 1.6;
+        overflow-wrap: anywhere;
+      }
+      .confirmation button {
+        display: block;
+        min-height: 40px;
+        margin-top: 7px;
+        padding: 6px 9px;
+        border: 1px solid var(--stamp-teal);
+        border-radius: 2px;
+        background: transparent;
+        color: var(--ink);
+        cursor: pointer;
+      }
+      .board {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        min-width: 0;
+      }
+      .column {
+        display: flex;
+        min-width: 0;
+        min-height: 150px;
+        flex-direction: column;
+        border: 1px solid var(--card-edge);
+        border-radius: 3px;
+        background: rgba(0, 0, 0, 0.045);
+      }
+      .column-head {
+        display: flex;
+        min-height: 44px;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--card-edge);
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.4;
+      }
+      .count {
+        flex: 0 0 auto;
+        color: var(--ink-soft);
+        font-size: 11px;
+        font-weight: 400;
+      }
+      .column-body {
+        display: flex;
+        min-width: 0;
+        min-height: 100px;
+        flex: 1;
+        flex-direction: column;
+        gap: 10px;
+        padding: 9px;
+      }
+      .empty-note,
+      .empty-state {
+        margin: auto;
+        padding: 16px 8px;
+        color: var(--ink-soft);
+        text-align: center;
+        font-size: 12px;
+        font-style: italic;
+        line-height: 1.6;
+      }
+      .ticket-card {
+        display: flex;
+        width: 100%;
+        min-width: 0;
+        min-height: 194px;
+        flex-direction: column;
+        gap: 9px;
+        padding: 12px;
+        border: 1px solid var(--card-edge);
+        border-radius: 2px;
+        background: var(--card);
+        box-shadow: 0 3px 8px var(--shadow);
+        animation: file-in 0.25s ease both;
+      }
+      @keyframes file-in {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .ticket-card-top {
+        display: flex;
+        min-width: 0;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .ticket-number {
+        min-width: 0;
+        color: var(--ink-soft);
+        font-size: 11px;
+        font-weight: 700;
+        overflow-wrap: anywhere;
+      }
+      .status-badge {
+        display: inline-flex;
+        min-height: 26px;
+        flex: 0 0 auto;
+        align-items: center;
+        padding: 3px 7px;
+        border: 1px solid var(--line);
+        border-radius: 2px;
+        font-size: 10px;
+        font-weight: 700;
+      }
+      .status-new { color: var(--stamp-teal); border-color: var(--stamp-teal); }
+      .status-in_progress { color: var(--stamp-amber); border-color: var(--stamp-amber); }
+      .status-closed { color: var(--stamp-red); border-color: var(--stamp-red); }
+      .ticket-title {
+        display: -webkit-box;
+        min-width: 0;
+        overflow: hidden;
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+      }
+      .ticket-description {
+        display: -webkit-box;
+        min-width: 0;
+        overflow: hidden;
+        margin: 0;
+        color: var(--ink-soft);
+        font-size: 12px;
+        line-height: 1.45;
+        overflow-wrap: anywhere;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+      }
+      .ticket-tags {
+        display: flex;
+        max-height: 45px;
+        min-width: 0;
+        flex-wrap: wrap;
+        gap: 5px;
+        overflow: hidden;
+      }
+      .tag {
+        max-width: 100%;
+        padding: 3px 7px;
+        overflow: hidden;
+        border: 1px solid var(--card-edge);
+        border-radius: 10px;
+        background: rgba(0, 0, 0, 0.04);
+        color: var(--ink-soft);
+        font-size: 10px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .priority-hoch { color: var(--stamp-red); border-color: var(--stamp-red); }
+      .priority-mittel { color: var(--stamp-amber); border-color: var(--stamp-amber); }
+      .priority-niedrig { color: var(--stamp-teal); border-color: var(--stamp-teal); }
+      .ticket-card-footer {
+        display: flex;
+        min-width: 0;
+        flex-wrap: wrap;
+        align-items: end;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: auto;
+      }
+      .ticket-details {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        gap: 3px;
+        color: var(--ink-soft);
+        font-size: 10px;
+        overflow-wrap: anywhere;
+      }
+      .ticket-author { font-size: 11px; }
+      .ticket-date { font-size: 10px; }
+      .age { color: var(--ink-soft); font-size: 10px; }
+      .status-select { width: auto; min-width: min(100%, 130px); min-height: 44px; padding: 7px 26px 7px 8px; font-size: 12px; }
+      .page-heading { margin: 0 0 5px; font-size: 20px; }
+      .filter-panel { margin-bottom: 12px; }
+      .filters {
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        align-items: end;
+      }
+      .filters label { margin-top: 0; }
+      .result-line { margin: 12px 0 9px; color: var(--ink-soft); font-size: 12px; }
+      .ticket-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+        min-width: 0;
+        align-items: stretch;
+        gap: 12px;
+      }
+      .ticket-list .ticket-card { height: 100%; }
+      .ticket-list .ticket-description { min-height: 35px; }
+      .lookup-panel { width: 100%; max-width: 680px; }
+      .lookup-form {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: end;
+        gap: 10px;
+      }
+      .lookup-form label { margin-top: 0; }
+      .lookup-form .primary-btn { min-width: 150px; }
+      .status-result { display: grid; min-width: 0; gap: 12px; margin-top: 18px; }
+      .status-aside { margin: 0; color: var(--ink-soft); font-size: 11px; line-height: 1.5; }
+      .site-footer { margin-top: 28px; color: var(--ink-soft); text-align: center; font-size: 11px; line-height: 1.6; }
       .toast {
         position: fixed;
-        left: 50%;
-        bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-        transform: translateX(-50%) translateY(20px);
+        z-index: 10;
+        right: max(16px, env(safe-area-inset-right));
+        bottom: max(18px, env(safe-area-inset-bottom));
+        width: max-content;
+        max-width: min(420px, calc(100vw - 32px));
+        padding: 12px 16px;
+        transform: translateY(12px);
+        border: 1px solid var(--card-edge);
+        border-radius: 3px;
         background: var(--ink);
         color: var(--card);
-        padding: 10px 16px;
-        border-radius: 4px;
-        font-size: 12.5px;
         opacity: 0;
         pointer-events: none;
-        transition:
-          opacity 0.25s ease,
-          transform 0.25s ease;
-        max-width: 90vw;
-        text-align: center;
         box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        z-index: 50;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+        font-size: 12px;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
       }
-      .toast.show {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
+      .toast.show { transform: translateY(0); opacity: 1; }
+      @media (max-width: 900px) {
+        .layout { grid-template-columns: minmax(0, 1fr); }
+        .form-panel { position: static; }
+        .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       }
-
+      @media (max-width: 620px) {
+        .wrap { padding: 22px 12px 40px; }
+        .site-header { padding: 21px 16px 16px; }
+        .site-header::before { left: 16px; }
+        .site-nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+        .nav-button { padding: 7px 5px; font-size: 11px; overflow-wrap: anywhere; }
+        .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .board { grid-template-columns: minmax(0, 1fr); }
+        .column { min-height: 125px; }
+        .column-body { min-height: 82px; }
+        .filters { grid-template-columns: minmax(0, 1fr); }
+        .lookup-form { grid-template-columns: minmax(0, 1fr); }
+        .lookup-form .primary-btn { width: 100%; }
+        .ticket-list { grid-template-columns: minmax(0, 1fr); }
+      }
       @media (prefers-reduced-motion: reduce) {
-        .ticket {
-          animation: none;
-        }
-        .toast {
-          transition: none;
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
         }
       }
     </style>
   </head>
   <body>
     <div class="wrap">
-      <header>
+      <header class="site-header">
         <h1>Ticket-Ablage</h1>
-        <p class="subtitle">
-          Amt für Zurückhaltende Reaktionen &nbsp;·&nbsp; Zuständig, aber
-          unterbesetzt
-        </p>
-        <div class="stats" id="stats"></div>
+        <p class="subtitle">Amt für Zurückhaltende Reaktionen · Zuständig, aber unterbesetzt</p>
+        <nav class="site-nav" aria-label="Hauptnavigation">
+          <button class="nav-button" type="button" data-view-target="new" aria-current="page">Neues Anliegen</button>
+          <button class="nav-button" type="button" data-view-target="tickets">Alle Tickets</button>
+          <button class="nav-button" type="button" data-view-target="status">Status prüfen</button>
+        </nav>
+        <div class="stats" id="stats" aria-label="Ticket-Statistik"></div>
       </header>
 
-      <div class="layout">
-        <section class="form-panel">
-          <h2>Neues Anliegen einreichen</h2>
-          <p class="hint">Wird gelesen. Irgendwann. Vermutlich.</p>
+      <main>
+        <section class="view" id="view-new" data-view="new">
+          <div class="layout">
+            <section class="form-panel" aria-labelledby="form-heading">
+              <h2 id="form-heading">Neues Anliegen einreichen</h2>
+              <p class="hint">Wird gelesen. Irgendwann. Vermutlich.</p>
+              <form id="ticket-form" novalidate>
+                <label for="title">Worum geht's *</label>
+                <input id="title" name="title" type="text" maxlength="60" placeholder="z. B. Drucker macht Geräusche" required aria-label="Betreff des Anliegens" aria-describedby="title-error" />
+                <p class="field-error" id="title-error" aria-live="polite"></p>
 
-          <form id="ticketForm">
-            <label for="title">Worum geht's</label>
-            <input
-              type="text"
-              id="title"
-              maxlength="60"
-              placeholder="z. B. Drucker macht Geräusche"
-              required
-            />
+                <label for="description">Beschreibung *</label>
+                <textarea id="description" name="description" maxlength="220" placeholder="Bitte möglichst dramatisch schildern." required aria-label="Beschreibung des Anliegens" aria-describedby="description-error"></textarea>
+                <p class="field-error" id="description-error" aria-live="polite"></p>
 
-            <label for="desc">Beschreibung</label>
-            <textarea
-              id="desc"
-              maxlength="220"
-              placeholder="Bitte möglichst dramatisch schildern."
-            ></textarea>
+                <label for="category">Kategorie</label>
+                <select id="category" name="category" aria-label="Kategorie des Anliegens">
+                  <option>Technik streikt</option>
+                  <option>Passwort vergessen (schon wieder)</option>
+                  <option>WLAN fühlt sich nicht gesehen</option>
+                  <option>Drucker brennt (im übertragenen Sinne)</option>
+                  <option>Sonstiges Chaos</option>
+                </select>
 
-            <label for="category">Kategorie</label>
-            <select id="category">
-              <option>Technik streikt</option>
-              <option>Passwort vergessen (schon wieder)</option>
-              <option>WLAN fühlt sich nicht gesehen</option>
-              <option>Drucker brennt (im übertragenen Sinne)</option>
-              <option>Sonstiges Chaos</option>
-            </select>
+                <label for="priority">Dringlichkeit</label>
+                <select id="priority" name="priority" aria-label="Dringlichkeit des Anliegens">
+                  <option value="niedrig">Kann warten</option>
+                  <option value="mittel">Wäre nett, bald</option>
+                  <option value="hoch">Angeblich super wichtig</option>
+                </select>
 
-            <label for="prio">Dringlichkeit</label>
-            <select id="prio">
-              <option value="niedrig">Kann warten</option>
-              <option value="mittel">Wäre nett, bald</option>
-              <option value="hoch">Angeblich super wichtig</option>
-            </select>
+                <label for="author">Gemeldet von</label>
+                <input id="author" name="author" type="text" maxlength="30" placeholder="Dein Name" aria-label="Name der meldenden Person" />
+                <button class="primary-btn submit-btn" type="submit">Ticket einreichen</button>
+                <div class="confirmation" id="confirmation" role="status" aria-live="polite" hidden></div>
+              </form>
+              <p class="grumble">Durchschnittliche Reaktionszeit: unbekannt.</p>
+            </section>
 
-            <label for="reporter">Gemeldet von</label>
-            <input
-              type="text"
-              id="reporter"
-              maxlength="30"
-              placeholder="Dein Name"
-            />
-
-            <button type="submit" class="submit-btn">Ticket einreichen</button>
-          </form>
-          <p class="grumble">Durchschnittliche Reaktionszeit: unbekannt.</p>
+            <section aria-label="Ticket-Übersicht">
+              <div class="board" id="board"></div>
+            </section>
+          </div>
         </section>
 
-        <section class="board" id="board" aria-label="Ticket-Übersicht">
-          <!-- Spalten werden per JS befüllt -->
+        <section class="view" id="view-tickets" data-view="tickets" hidden>
+          <h2 class="page-heading">Aktenübersicht</h2>
+          <p class="page-intro">Suche, Sortierung und Filter greifen sofort. Statusänderungen werden direkt in der Akte vermerkt.</p>
+          <section class="filter-panel" aria-label="Tickets filtern">
+            <div class="filters">
+              <div>
+                <label for="search">Vorgang suchen</label>
+                <input id="search" type="text" aria-label="Suche nach Nummer, Betreff, Beschreibung oder Name" placeholder="Nummer, Thema, Autor …" />
+              </div>
+              <div>
+                <label for="filter-category">Kategorie</label>
+                <select id="filter-category" aria-label="Nach Kategorie filtern"><option value="">Alle Kategorien</option></select>
+              </div>
+              <div>
+                <label for="filter-status">Status</label>
+                <select id="filter-status" aria-label="Nach Status filtern">
+                  <option value="">Alle Status</option>
+                  <option value="new">Neu</option>
+                  <option value="in_progress">In Bearbeitung</option>
+                  <option value="closed">Geschlossen</option>
+                </select>
+              </div>
+              <div>
+                <label for="sort-tickets">Sortieren</label>
+                <select id="sort-tickets" aria-label="Tickets sortieren">
+                  <option value="newest">Neueste zuerst</option>
+                  <option value="oldest">Älteste zuerst</option>
+                  <option value="priority">Dringlichkeit</option>
+                </select>
+              </div>
+            </div>
+          </section>
+          <p class="result-line" id="result-count" aria-live="polite"></p>
+          <section class="ticket-list" id="ticket-list" aria-label="Ticketliste"></section>
         </section>
-      </div>
 
-      <footer>
-        * Einstufung erfolgt automatisch und wird nicht überprüft. Widerspruch
-        aussichtslos.
-      </footer>
+        <section class="view" id="view-status" data-view="status" hidden>
+          <section class="lookup-panel" aria-labelledby="lookup-heading">
+            <h2 id="lookup-heading">Wo steckt der Vorgang?</h2>
+            <p class="hint">Die Ticketnummer steht auf der Eingangsbestätigung, zum Beispiel T-00005-A13F.</p>
+            <form class="lookup-form" id="status-form" novalidate>
+              <div>
+                <label for="ticket-number">Ticketnummer</label>
+                <input id="ticket-number" name="ticketNumber" type="text" aria-label="Ticketnummer" placeholder="T-00005-A13F" autocomplete="off" aria-describedby="number-error" />
+                <p class="field-error" id="number-error" aria-live="polite"></p>
+              </div>
+              <button class="primary-btn" type="submit">Akte suchen</button>
+            </form>
+            <section class="status-result" id="status-result" aria-live="polite" aria-label="Ergebnis der Statusabfrage"></section>
+          </section>
+        </section>
+      </main>
+
+      <footer class="site-footer">* Einstufung erfolgt automatisch und wird nicht überprüft. Widerspruch aussichtslos.</footer>
     </div>
-
-    <div class="toast" id="toast"></div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
     <script>
       (function () {
         "use strict";
 
-        var COLUMNS = [
-          { id: "eingegangen", label: "Eingegangen" },
-          { id: "ignoriert", label: "Ignoriert" },
-          { id: "bearbeitung", label: "In Bearbeitung (Kaffeepause)" },
-          { id: "erledigt", label: "Erledigt (aus Versehen)" },
-        ];
-
-        var EMPTY_NOTES = {
-          eingegangen: "Hier herrscht gerade Ruhe. Verdächtig.",
-          ignoriert:
-            "Noch nichts wurde konsequent ignoriert. Das ändert sich sicher.",
-          bearbeitung: "Niemand macht gerade Kaffeepause. Ungewöhnlich.",
-          erledigt: "Erfolge sind rar. Wie erwartet.",
-        };
-
-        var PRIO_LABEL = {
-          niedrig: "Kann warten",
-          mittel: "Wäre nett",
-          hoch: "Angeblich wichtig",
-        };
-
         var STORAGE_KEY = "ticket-ablage-v1";
+        var CATEGORIES = [
+          "Technik streikt",
+          "Passwort vergessen (schon wieder)",
+          "WLAN fühlt sich nicht gesehen",
+          "Drucker brennt (im übertragenen Sinne)",
+          "Sonstiges Chaos",
+        ];
+        var PRIORITIES = [
+          { id: "hoch", label: "Angeblich super wichtig", rank: 3 },
+          { id: "mittel", label: "Wäre nett, bald", rank: 2 },
+          { id: "niedrig", label: "Kann warten", rank: 1 },
+        ];
+        var STATUSES = [
+          { id: "new", label: "Neu", boardLabel: "Eingegangen" },
+          { id: "in_progress", label: "In Bearbeitung", boardLabel: "In Bearbeitung (Kaffeepause)" },
+          { id: "closed", label: "Geschlossen", boardLabel: "Erledigt (aus Versehen)" },
+        ];
+        var EMPTY_NOTES = {
+          new: "Hier herrscht gerade Ruhe. Verdächtig.",
+          in_progress: "Niemand macht gerade Kaffeepause. Ungewöhnlich.",
+          closed: "Erfolge sind rar. Wie erwartet.",
+        };
         var tickets = [];
-        var nextId = 1;
+        var nextNumber = 1;
+        var toastTimer = 0;
 
-        function loadState() {
+        function createId() {
+          if (window.crypto && typeof window.crypto.randomUUID === "function") {
+            return window.crypto.randomUUID();
+          }
+          return Date.now().toString(36) + Math.random().toString(36).slice(2);
+        }
+
+        function parseTimestamp(value) {
+          if (typeof value === "number" && Number.isFinite(value) && Number.isFinite(new Date(value).getTime())) return value;
+          if (typeof value === "string" && value.trim()) {
+            var numeric = Number(value);
+            if (Number.isFinite(numeric) && Number.isFinite(new Date(numeric).getTime())) return numeric;
+          }
+          var parsed = Date.parse(value);
+          return Number.isFinite(parsed) && Number.isFinite(new Date(parsed).getTime()) ? parsed : Date.now();
+        }
+
+        function normalizeStatus(status) {
+          if (status === "in_progress" || status === "bearbeitung") return "in_progress";
+          if (status === "closed" || status === "erledigt") return "closed";
+          return "new";
+        }
+
+        function normalizeTicket(ticket, index) {
+          var id = String(ticket.id || createId());
+          var oldNumber = Number(ticket.id);
+          var sequence = Number.isFinite(oldNumber) ? oldNumber : index + 1;
+          var suffix = id.replace(/[^a-z0-9]/gi, "").slice(-4).toUpperCase().padStart(4, "0");
+          var priority = ticket.priority || ticket.prio;
+          return {
+            id: id,
+            ticketNumber: ticket.ticketNumber || "T-" + String(sequence).padStart(5, "0") + "-" + suffix,
+            title: String(ticket.title || "Ohne Betreff"),
+            description: String(ticket.description || ticket.desc || ""),
+            category: String(ticket.category || CATEGORIES[CATEGORIES.length - 1]),
+            priority: PRIORITIES.some(function (item) { return item.id === priority; }) ? priority : "niedrig",
+            author: String(ticket.author || ticket.reporter || "anonym"),
+            status: normalizeStatus(ticket.status),
+            createdAt: parseTimestamp(ticket.createdAt || ticket.created),
+          };
+        }
+
+        function showToast(message) {
+          var toast = document.getElementById("toast");
+          toast.textContent = message;
+          toast.classList.add("show");
+          window.clearTimeout(toastTimer);
+          toastTimer = window.setTimeout(function () { toast.classList.remove("show"); }, 3200);
+        }
+
+        function saveToStorage(nextTickets, followingNumber) {
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+              tickets: nextTickets,
+              nextNumber: followingNumber || nextNumber,
+            }));
+            tickets = nextTickets;
+            if (followingNumber) nextNumber = followingNumber;
+            return true;
+          } catch (error) {
+            showToast("Speichern fehlgeschlagen. Bitte Browser-Speicher prüfen.");
+            return false;
+          }
+        }
+
+        function fetchFromAPI() {
+          return Promise.resolve(tickets.slice());
+        }
+
+        function loadTickets() {
           try {
             var raw = localStorage.getItem(STORAGE_KEY);
-            if (raw) {
-              var data = JSON.parse(raw);
-              tickets = data.tickets || [];
-              nextId = data.nextId || tickets.length + 1;
+            if (!raw) {
+              tickets = [];
+              nextNumber = 1;
               return;
             }
-          } catch (e) {
-            /* kein Speicher, kein Problem */
+            var data = JSON.parse(raw);
+            var storedTickets = Array.isArray(data) ? data : (Array.isArray(data.tickets) ? data.tickets : []);
+            tickets = storedTickets.map(normalizeTicket);
+            var highest = tickets.reduce(function (current, ticket) {
+              var found = ticket.ticketNumber.match(/-(\d+)-/);
+              return Math.max(current, found ? Number(found[1]) : 0);
+            }, 0);
+            nextNumber = Math.max(Number(data.nextNumber) || 1, highest + 1);
+            if (!Array.isArray(data) && data.tickets) saveToStorage(tickets, nextNumber);
+          } catch (error) {
+            tickets = [];
+            nextNumber = 1;
+            showToast("Aktenablage nicht lesbar. Das Amt prüft den Aktenschrank.");
           }
-          seedDemo();
         }
 
-        function saveState() {
-          try {
-            localStorage.setItem(
-              STORAGE_KEY,
-              JSON.stringify({ tickets: tickets, nextId: nextId }),
-            );
-          } catch (e) {
-            /* Speicher nicht verfügbar - Zustand bleibt nur in dieser Sitzung */
+        function makeElement(tag, className, text) {
+          var element = document.createElement(tag);
+          if (className) element.className = className;
+          if (text !== undefined) element.textContent = text;
+          return element;
+        }
+
+        function getStatus(statusId) {
+          return STATUSES.find(function (status) { return status.id === statusId; }) || STATUSES[0];
+        }
+
+        function getPriority(priorityId) {
+          return PRIORITIES.find(function (priority) { return priority.id === priorityId; }) || PRIORITIES[2];
+        }
+
+        function formatDate(timestamp) {
+          return new Intl.DateTimeFormat("de-DE", { dateStyle: "medium", timeStyle: "short" }).format(new Date(parseTimestamp(timestamp)));
+        }
+
+        function createTicketCard(ticket, allowStatusChange) {
+          var card = makeElement("article", "ticket-card");
+          var top = makeElement("div", "ticket-card-top");
+          top.appendChild(makeElement("span", "ticket-number", ticket.ticketNumber));
+          top.appendChild(makeElement("span", "status-badge status-" + ticket.status, getStatus(ticket.status).label));
+          card.appendChild(top);
+          card.appendChild(makeElement("h3", "ticket-title", ticket.title));
+          card.appendChild(makeElement("p", "ticket-description", ticket.description || "Beschreibung aus Gründen der Geheimhaltung nicht vorhanden."));
+
+          var tags = makeElement("div", "ticket-tags");
+          tags.appendChild(makeElement("span", "tag", ticket.category));
+          tags.appendChild(makeElement("span", "tag priority-" + ticket.priority, getPriority(ticket.priority).label));
+          card.appendChild(tags);
+
+          var footer = makeElement("div", "ticket-card-footer");
+          var details = makeElement("div", "ticket-details");
+          details.appendChild(makeElement("span", "ticket-author", "von " + (ticket.author || "anonym")));
+          var time = makeElement("time", "ticket-date", formatDate(ticket.createdAt));
+          time.dateTime = new Date(parseTimestamp(ticket.createdAt)).toISOString();
+          details.appendChild(time);
+          footer.appendChild(details);
+          if (allowStatusChange) {
+            var select = makeElement("select", "status-select");
+            select.setAttribute("aria-label", "Status des Tickets " + ticket.ticketNumber);
+            STATUSES.forEach(function (status) {
+              var option = makeElement("option", "", status.label);
+              option.value = status.id;
+              option.selected = status.id === ticket.status;
+              select.appendChild(option);
+            });
+            select.addEventListener("change", function () { updateTicketStatus(ticket.id, select.value); });
+            footer.appendChild(select);
+          } else {
+            footer.appendChild(makeElement("span", "age", ageLabel(ticket.createdAt)));
           }
+          card.appendChild(footer);
+          return card;
         }
 
-        function seedDemo() {
-          var now = Date.now();
-          tickets = [
-            {
-              id: nextId++,
-              title: "Drucker macht Geräusche wie ein Muffin-Mixer",
-              desc: "Seit Montag. Niemand traut sich hin.",
-              category: "Drucker brennt (im übertragenen Sinne)",
-              prio: "mittel",
-              reporter: "F. Krause",
-              status: "eingegangen",
-              created: now - 1000 * 60 * 60 * 26,
-            },
-            {
-              id: nextId++,
-              title: "WLAN heißt jetzt 'Kein Internet für dich'",
-              desc: "Vermutlich Absicht.",
-              category: "WLAN fühlt sich nicht gesehen",
-              prio: "hoch",
-              reporter: "S. Bode",
-              status: "ignoriert",
-              created: now - 1000 * 60 * 60 * 24 * 4,
-            },
-            {
-              id: nextId++,
-              title: "Kaffeemaschine als 'IT-Problem' gemeldet",
-              desc: "Aus Verzweiflung. Bitte trotzdem lesen.",
-              category: "Sonstiges Chaos",
-              prio: "niedrig",
-              reporter: "anonym",
-              status: "bearbeitung",
-              created: now - 1000 * 60 * 60 * 3,
-            },
-            {
-              id: nextId++,
-              title: "Monitor flackert im Takt der Musik",
-              desc: "War wohl nur ein loses Kabel.",
-              category: "Technik streikt",
-              prio: "niedrig",
-              reporter: "J. Ahrens",
-              status: "erledigt",
-              created: now - 1000 * 60 * 60 * 50,
-            },
-          ];
-          saveState();
-        }
-
-        function fmtAge(ts) {
-          var created = createdTimestamp(ts);
-          if (created === null) return "Alter unbekannt";
-          var diffMs = Date.now() - created;
-          var hours = Math.floor(diffMs / 3600000);
+        function ageLabel(timestamp) {
+          var hours = Math.floor((Date.now() - parseTimestamp(timestamp)) / 3600000);
           if (hours < 1) return "gerade erst gemeldet";
           if (hours < 24) return hours + " Std. offen";
           var days = Math.floor(hours / 24);
           return days + " Tag" + (days === 1 ? "" : "e") + " offen";
         }
 
-        function createdTimestamp(value) {
-          if (typeof value === "number" && Number.isFinite(value)) return value;
-          if (typeof value === "string" && value.trim() !== "") {
-            var numeric = Number(value);
-            if (Number.isFinite(numeric)) return numeric;
-          }
-          var parsed = Date.parse(value);
-          return Number.isFinite(parsed) ? parsed : null;
-        }
-
-        function isOld(ts) {
-          var created = createdTimestamp(ts);
-          return created !== null && Date.now() - created > 1000 * 60 * 60 * 24 * 2;
-        }
-
         function renderStats() {
-          var open = tickets.filter(function (t) {
-            return t.status !== "erledigt";
-          }).length;
-          var oldestAgeDays = 0;
-          tickets.forEach(function (t) {
-            var created = createdTimestamp(t.created);
-            if (created === null) return;
-            var d = Math.floor((Date.now() - created) / 86400000);
-            if (d > oldestAgeDays) oldestAgeDays = d;
+          var stats = document.getElementById("stats");
+          stats.replaceChildren();
+          var open = tickets.filter(function (ticket) { return ticket.status !== "closed"; }).length;
+          var oldestDays = tickets.reduce(function (oldest, ticket) {
+            return Math.max(oldest, Math.floor((Date.now() - parseTimestamp(ticket.createdAt)) / 86400000));
+          }, 0);
+          var closedRate = tickets.length ? Math.round((tickets.length - open) / tickets.length * 100) : 0;
+          [
+            [tickets.length, "Tickets insgesamt"],
+            [open, "noch offen"],
+            [oldestDays, "Tage ältestes Ticket"],
+            [closedRate + " %", "angeblich erledigt"],
+          ].forEach(function (item) {
+            var stat = makeElement("div", "stat");
+            stat.appendChild(makeElement("b", "", String(item[0])));
+            stat.appendChild(makeElement("span", "", item[1]));
+            stats.appendChild(stat);
           });
-          var doneCount = tickets.filter(function (t) {
-            return t.status === "erledigt";
-          }).length;
-          var rate = tickets.length
-            ? Math.round((doneCount / tickets.length) * 100)
-            : 0;
-
-          var html =
-            '<div class="stat"><b>' +
-            tickets.length +
-            "</b>Tickets insgesamt</div>" +
-            '<div class="stat"><b>' +
-            open +
-            "</b>noch offen</div>" +
-            '<div class="stat"><b>' +
-            oldestAgeDays +
-            "</b>Tage ältestes Ticket</div>" +
-            '<div class="stat"><b>' +
-            rate +
-            " %</b>angeblich erledigt</div>";
-          document.getElementById("stats").innerHTML = html;
         }
 
-        function renderBoard() {
+        function renderTickets() {
           var board = document.getElementById("board");
-          board.innerHTML = "";
-
-          COLUMNS.forEach(function (col) {
-            var colTickets = tickets.filter(function (t) {
-              return t.status === col.id;
+          board.replaceChildren();
+          STATUSES.forEach(function (status) {
+            var column = makeElement("section", "column");
+            column.dataset.status = status.id;
+            var matching = tickets.filter(function (ticket) { return ticket.status === status.id; });
+            var heading = makeElement("div", "column-head");
+            heading.appendChild(makeElement("span", "", status.boardLabel));
+            heading.appendChild(makeElement("span", "count", String(matching.length)));
+            column.appendChild(heading);
+            var body = makeElement("div", "column-body");
+            body.dataset.status = status.id;
+            if (!matching.length) body.appendChild(makeElement("p", "empty-note", EMPTY_NOTES[status.id]));
+            matching.sort(function (a, b) { return parseTimestamp(b.createdAt) - parseTimestamp(a.createdAt); });
+            matching.forEach(function (ticket) {
+              var card = createTicketCard(ticket, false);
+              card.draggable = true;
+              card.dataset.ticketId = ticket.id;
+              body.appendChild(card);
             });
-
-            var colEl = document.createElement("div");
-            colEl.className = "column";
-
-            var head = document.createElement("div");
-            head.className = "column-head";
-            head.innerHTML =
-              "<span>" +
-              col.label +
-              '</span><span class="count">' +
-              colTickets.length +
-              "</span>";
-            colEl.appendChild(head);
-
-            var body = document.createElement("div");
-            body.className = "column-body";
-            if (colTickets.length === 0) {
-              var note = document.createElement("div");
-              note.className = "empty-note";
-              note.textContent = EMPTY_NOTES[col.id];
-              body.appendChild(note);
-            } else {
-              colTickets
-                .slice()
-                .sort(function (a, b) {
-                  return (createdTimestamp(b.created) || 0) - (createdTimestamp(a.created) || 0);
-                })
-                .forEach(function (t) {
-                  body.appendChild(renderTicket(t, col.id));
-                });
-            }
-
-            colEl.appendChild(body);
-            board.appendChild(colEl);
+            column.appendChild(body);
+            board.appendChild(column);
           });
-        }
-
-        function renderTicket(t, currentColId) {
-          var el = document.createElement("div");
-          el.className = "ticket";
-          el.draggable = true;
-          el.dataset.ticketId = t.id;
-
-          var title = document.createElement("p");
-          title.className = "ticket-title";
-          title.textContent = t.title;
-          el.appendChild(title);
-
-          if (t.desc) {
-            var desc = document.createElement("p");
-            desc.className = "ticket-desc";
-            desc.textContent = t.desc;
-            el.appendChild(desc);
-          }
-
-          var meta = document.createElement("div");
-          meta.className = "ticket-meta";
-          var catTag = document.createElement("span");
-          catTag.className = "tag";
-          catTag.textContent = t.category;
-          meta.appendChild(catTag);
-          var prioTag = document.createElement("span");
-          prioTag.className = "tag prio-" + t.prio;
-          prioTag.textContent = PRIO_LABEL[t.prio];
-          meta.appendChild(prioTag);
-          el.appendChild(meta);
-
-          var foot = document.createElement("div");
-          foot.className = "ticket-foot";
-
-          var left = document.createElement("div");
-          var reporter = document.createElement("div");
-          reporter.className = "reporter";
-          reporter.textContent = "von " + (t.reporter || "anonym");
-          left.appendChild(reporter);
-          var age = document.createElement("div");
-          age.className = "age" + (isOld(t.created) ? " old" : "");
-          age.textContent = fmtAge(t.created);
-          left.appendChild(age);
-          foot.appendChild(left);
-
-          var actions = document.createElement("div");
-          actions.className = "ticket-actions";
-
-          var idx = COLUMNS.findIndex(function (c) {
-            return c.id === currentColId;
-          });
-          if (idx < COLUMNS.length - 1) {
-            var nextBtn = document.createElement("button");
-            nextBtn.type = "button";
-            nextBtn.textContent = "weiter →";
-            nextBtn.addEventListener("click", function () {
-              t.status = COLUMNS[idx + 1].id;
-              saveState();
-              renderAll();
-              showToast(toastForMove(COLUMNS[idx + 1].id));
-            });
-            actions.appendChild(nextBtn);
-          }
-
-          var delBtn = document.createElement("button");
-          delBtn.type = "button";
-          delBtn.textContent = "vergessen";
-          delBtn.addEventListener("click", function () {
-            tickets = tickets.filter(function (x) {
-              return x.id !== t.id;
-            });
-            saveState();
-            renderAll();
-            showToast("Ticket erfolgreich verdrängt.");
-          });
-          actions.appendChild(delBtn);
-
-          foot.appendChild(actions);
-          el.appendChild(foot);
-
-          return el;
-        }
-
-        function toastForMove(statusId) {
-          switch (statusId) {
-            case "ignoriert":
-              return "Ticket wird nun offiziell ignoriert.";
-            case "bearbeitung":
-              return "Bearbeitung beginnt. Kaffee wird geholt.";
-            case "erledigt":
-              return "Als erledigt markiert. Glückwunsch, vermutlich.";
-            default:
-              return "Status geändert.";
-          }
-        }
-        
-        var board = document.getElementById("board");
-        board.addEventListener("dragstart", function (ev) {
-          var ticketEl = ev.target.closest(".ticket");
-          if (!ticketEl) return;
-          ev.dataTransfer.setData("text/plain", ticketEl.dataset.ticketId);
-          ev.dataTransfer.effectAllowed = "move";
-        });
-        board.addEventListener("dragover", function (ev) {
-          if (ev.target.closest(".column-body")) ev.preventDefault();
-        });
-        board.addEventListener("drop", function (ev) {
-          var columnBody = ev.target.closest(".column-body");
-          if (!columnBody) return;
-          ev.preventDefault();
-          var ticketId = Number(ev.dataTransfer.getData("text/plain"));
-          var column = columnBody.closest(".column");
-          var columnIndex = Array.prototype.indexOf.call(board.children, column);
-          var ticket = tickets.find(function (item) {
-            return item.id === ticketId;
-          });
-          if (!ticket || columnIndex < 0 || columnIndex >= COLUMNS.length) return;
-          ticket.status = COLUMNS[columnIndex].id;
-          saveState();
-          renderAll();
-          showToast(toastForMove(ticket.status));
-        });
-        var toastTimer = null;
-        function showToast(msg) {
-          var el = document.getElementById("toast");
-          el.textContent = msg;
-          el.classList.add("show");
-          clearTimeout(toastTimer);
-          toastTimer = setTimeout(function () {
-            el.classList.remove("show");
-          }, 2200);
-        }
-
-        function renderAll() {
           renderStats();
-          renderBoard();
         }
 
-        document
-          .getElementById("ticketForm")
-          .addEventListener("submit", function (e) {
-            e.preventDefault();
-            var title = document.getElementById("title").value.trim();
-            if (!title) return;
+        function filterTickets() {
+          var list = document.getElementById("ticket-list");
+          var query = document.getElementById("search").value.trim().toLocaleLowerCase();
+          var category = document.getElementById("filter-category").value;
+          var status = document.getElementById("filter-status").value;
+          var sort = document.getElementById("sort-tickets").value;
+          var filtered = tickets.filter(function (ticket) {
+            var text = [ticket.ticketNumber, ticket.title, ticket.description, ticket.author, ticket.category].join(" ").toLocaleLowerCase();
+            return (!query || text.indexOf(query) >= 0) && (!category || ticket.category === category) && (!status || ticket.status === status);
+          });
+          filtered.sort(function (a, b) {
+            if (sort === "oldest") return parseTimestamp(a.createdAt) - parseTimestamp(b.createdAt);
+            if (sort === "priority") return getPriority(b.priority).rank - getPriority(a.priority).rank || parseTimestamp(b.createdAt) - parseTimestamp(a.createdAt);
+            return parseTimestamp(b.createdAt) - parseTimestamp(a.createdAt);
+          });
+          list.replaceChildren();
+          var resultCount = document.getElementById("result-count");
+          resultCount.textContent = filtered.length + (filtered.length === 1 ? " Akte gefunden" : " Akten gefunden");
+          if (!filtered.length) {
+            list.appendChild(makeElement("p", "empty-state", tickets.length
+              ? "Keine Akte passt. Sie wurde vermutlich falsch abgeheftet."
+              : "Noch keine Akten. Das Amt wartet auf den ersten Anlass."));
+            return;
+          }
+          filtered.forEach(function (ticket) { list.appendChild(createTicketCard(ticket, true)); });
+        }
 
-            var t = {
-              id: nextId++,
-              title: title,
-              desc: document.getElementById("desc").value.trim(),
+        function updateTicketStatus(ticketId, statusId) {
+          if (!STATUSES.some(function (status) { return status.id === statusId; })) return;
+          var updated = tickets.map(function (ticket) {
+            return ticket.id === ticketId ? Object.assign({}, ticket, { status: statusId }) : ticket;
+          });
+          if (!saveToStorage(updated)) return;
+          renderTickets();
+          filterTickets();
+          showToast("Status geändert. Die Akte wird weitergereicht.");
+        }
+
+        function setFieldError(field, errorId, message) {
+          field.setAttribute("aria-invalid", message ? "true" : "false");
+          document.getElementById(errorId).textContent = message;
+        }
+
+        function validateForm() {
+          var title = document.getElementById("title");
+          var description = document.getElementById("description");
+          setFieldError(title, "title-error", "");
+          setFieldError(description, "description-error", "");
+          if (!title.value.trim()) setFieldError(title, "title-error", "Ohne Betreff kann niemand betroffen schauen.");
+          if (!description.value.trim()) setFieldError(description, "description-error", "Ein paar Worte zum Vorgang, bitte.");
+          var invalid = document.querySelector('#ticket-form [aria-invalid="true"]');
+          if (invalid) invalid.focus();
+          return !invalid;
+        }
+
+        async function submitTicket(event) {
+          event.preventDefault();
+          if (!validateForm()) return;
+          var form = event.currentTarget;
+          var button = form.querySelector("button[type=submit]");
+          var originalText = button.textContent;
+          button.disabled = true;
+          button.textContent = "Wird eingereicht...";
+          try {
+            var id = createId();
+            var ticket = {
+              id: id,
+              ticketNumber: "T-" + String(nextNumber).padStart(5, "0") + "-" + id.slice(0, 4).toUpperCase(),
+              title: document.getElementById("title").value.trim(),
+              description: document.getElementById("description").value.trim(),
               category: document.getElementById("category").value,
-              prio: document.getElementById("prio").value,
-              reporter: document.getElementById("reporter").value.trim(),
-              status: "eingegangen",
-              created: Date.now(),
+              priority: document.getElementById("priority").value,
+              author: document.getElementById("author").value.trim() || "anonym",
+              status: "new",
+              createdAt: Date.now(),
             };
-            tickets.push(t);
-            saveState();
-            renderAll();
-            showToast("Ticket eingereicht. Es reiht sich ein.");
-            this.reset();
+            if (!saveToStorage(tickets.concat(ticket), nextNumber + 1)) throw new Error("storage unavailable");
+            form.reset();
+            form.querySelectorAll("[aria-invalid]").forEach(function (field) { field.removeAttribute("aria-invalid"); });
+            renderTickets();
+            var confirmation = document.getElementById("confirmation");
+            confirmation.replaceChildren();
+            confirmation.appendChild(document.createTextNode("Ticket Nr. " + ticket.ticketNumber + " ist eingegangen. Die Behörde tut bereits so, als hätte sie es bemerkt. "));
+            var trackButton = makeElement("button", "", "Status prüfen");
+            trackButton.type = "button";
+            trackButton.addEventListener("click", function () {
+              showView("status");
+              document.getElementById("ticket-number").value = ticket.ticketNumber;
+              document.getElementById("status-form").requestSubmit();
+            });
+            confirmation.appendChild(trackButton);
+            confirmation.hidden = false;
+            showToast("Ticket " + ticket.ticketNumber + " ist eingegangen.");
             document.getElementById("title").focus();
+          } catch (error) {
+            showToast("Ticket konnte nicht gespeichert werden. Bitte den Browser-Speicher prüfen.");
+          } finally {
+            button.disabled = false;
+            button.textContent = originalText;
+          }
+        }
+
+        function renderStatusResult(ticket) {
+          var result = document.getElementById("status-result");
+          result.replaceChildren();
+          if (!ticket) {
+            result.appendChild(makeElement("p", "empty-state", "Diese Nummer ist nicht in der Kartei. Vielleicht ist sie gerade in der Mittagspause."));
+            return;
+          }
+          result.appendChild(createTicketCard(ticket, false));
+          result.appendChild(makeElement("p", "status-aside", "Letzter bekannter Stand. Nachfragen beschleunigt die Behörde leider nicht."));
+        }
+
+        function showView(viewId) {
+          var knownView = ["new", "tickets", "status"].indexOf(viewId) >= 0;
+          if (!knownView) viewId = "new";
+          document.querySelectorAll("[data-view]").forEach(function (view) {
+            view.hidden = view.dataset.view !== viewId;
+          });
+          document.querySelectorAll("[data-view-target]").forEach(function (button) {
+            if (button.dataset.viewTarget === viewId) button.setAttribute("aria-current", "page");
+            else button.removeAttribute("aria-current");
+          });
+          if (viewId === "tickets") filterTickets();
+          if (viewId === "new") renderTickets();
+          if (viewId === "status") document.getElementById("ticket-number").focus();
+        }
+
+        function initialize() {
+          loadTickets();
+          document.getElementById("ticket-form").addEventListener("submit", submitTicket);
+          document.getElementById("board").addEventListener("dragstart", function (event) {
+            var card = event.target.closest("[data-ticket-id]");
+            if (!card) return;
+            event.dataTransfer.setData("text/plain", card.dataset.ticketId);
+            event.dataTransfer.effectAllowed = "move";
+          });
+          document.getElementById("board").addEventListener("dragover", function (event) {
+            if (event.target.closest(".column-body")) event.preventDefault();
+          });
+          document.getElementById("board").addEventListener("drop", function (event) {
+            var target = event.target.closest(".column-body");
+            if (!target) return;
+            event.preventDefault();
+            updateTicketStatus(event.dataTransfer.getData("text/plain"), target.dataset.status);
           });
 
-        loadState();
-        renderAll();
+          document.getElementById("ticket-form").addEventListener("input", function (event) {
+            if (event.target.getAttribute("aria-invalid") === "true" && event.target.value.trim()) {
+              var errorId = event.target.id + "-error";
+              setFieldError(event.target, errorId, "");
+            }
+          });
+          ["search", "filter-category", "filter-status", "sort-tickets"].forEach(function (id) {
+            var control = document.getElementById(id);
+            control.addEventListener(id === "search" ? "input" : "change", filterTickets);
+          });
+          CATEGORIES.forEach(function (category) {
+            var option = makeElement("option", "", category);
+            option.value = category;
+            document.getElementById("filter-category").appendChild(option);
+          });
+          var extraCategories = Array.from(new Set(tickets.map(function (ticket) { return ticket.category; })));
+          extraCategories.filter(function (category) { return CATEGORIES.indexOf(category) < 0; }).forEach(function (category) {
+            var option = makeElement("option", "", category);
+            option.value = category;
+            document.getElementById("filter-category").appendChild(option);
+          });
+          document.getElementById("status-form").addEventListener("submit", function (event) {
+            event.preventDefault();
+            var input = document.getElementById("ticket-number");
+            var number = input.value.trim().toLocaleUpperCase();
+            var error = document.getElementById("number-error");
+            input.removeAttribute("aria-invalid");
+            error.textContent = "";
+            if (!number) {
+              input.setAttribute("aria-invalid", "true");
+              error.textContent = "Bitte eine Ticketnummer eintragen.";
+              input.focus();
+              return;
+            }
+            var found = tickets.find(function (ticket) { return ticket.ticketNumber.toLocaleUpperCase() === number; });
+            renderStatusResult(found);
+          });
+          document.getElementById("ticket-number").addEventListener("input", function () {
+            document.getElementById("status-result").replaceChildren();
+          });
+          document.querySelectorAll("[data-view-target]").forEach(function (button) {
+            button.addEventListener("click", function () { showView(button.dataset.viewTarget); });
+          });
+          window.addEventListener("storage", function (event) {
+            if (event.key !== STORAGE_KEY || !event.newValue) return;
+            try {
+              var data = JSON.parse(event.newValue);
+              tickets = (data.tickets || []).map(normalizeTicket);
+              nextNumber = Number(data.nextNumber) || nextNumber;
+              renderTickets();
+              filterTickets();
+            } catch (error) {
+              showToast("Die Akte aus einem anderen Fenster war unlesbar.");
+            }
+          });
+          var hashView = window.location.hash.slice(1);
+          showView(["new", "tickets", "status"].indexOf(hashView) >= 0 ? hashView : "new");
+        }
+
+        window.TicketApp = {
+          fetchFromAPI: fetchFromAPI,
+          filterTickets: filterTickets,
+          renderTickets: renderTickets,
+          saveToStorage: saveToStorage,
+          submitTicket: submitTicket,
+        };
+        initialize();
       })();
     </script>
   </body>
