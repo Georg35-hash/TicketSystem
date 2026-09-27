@@ -410,7 +410,7 @@
       }
       .ticket-tags {
         display: flex;
-        max-height: 45px;
+        max-height: 68px;
         min-width: 0;
         flex-wrap: wrap;
         gap: 5px;
@@ -428,9 +428,18 @@
         text-overflow: ellipsis;
         white-space: nowrap;
       }
-      .priority-hoch { color: var(--stamp-red); border-color: var(--stamp-red); }
-      .priority-mittel { color: var(--stamp-amber); border-color: var(--stamp-amber); }
-      .priority-niedrig { color: var(--stamp-teal); border-color: var(--stamp-teal); }
+      .priority-p1 { color: var(--stamp-red); border-color: var(--stamp-red); }
+      .priority-p2 { color: #a34f12; border-color: #a34f12; }
+      .priority-p3 { color: var(--stamp-amber); border-color: var(--stamp-amber); }
+      .priority-p4 { color: var(--stamp-teal); border-color: var(--stamp-teal); }
+      .priority-p5 { color: var(--ink-soft); border-color: var(--line); }
+      .sla-result { margin: 10px 0 0; padding: 9px 10px; border-left: 3px solid var(--line); background: rgba(0, 0, 0, 0.045); font-size: 12px; line-height: 1.5; }
+      .sla-result strong { display: inline-block; margin-left: 4px; }
+      .sla-result.priority-p1 { border-color: var(--stamp-red); }
+      .sla-result.priority-p2 { border-color: #a34f12; }
+      .sla-result.priority-p3 { border-color: var(--stamp-amber); }
+      .sla-result.priority-p4 { border-color: var(--stamp-teal); }
+      .sla-result.priority-p5 { border-color: var(--line); }
       .ticket-card-footer {
         display: flex;
         min-width: 0;
@@ -575,12 +584,20 @@
                   <option>Sonstiges Chaos</option>
                 </select>
 
-                <label for="priority">Dringlichkeit</label>
-                <select id="priority" name="priority" aria-label="Dringlichkeit des Anliegens">
-                  <option value="niedrig">Kann warten</option>
-                  <option value="mittel">Wäre nett, bald</option>
-                  <option value="hoch">Angeblich super wichtig</option>
+                <label for="impact">Auswirkung (Schadenshöhe)</label>
+                <select id="impact" name="impact" required aria-label="Auswirkung oder Schadenshöhe">
+                  <option value="hoch">Hoch (High)</option>
+                  <option value="mittel" selected>Medium</option>
+                  <option value="gering">Niedrig (Low)</option>
                 </select>
+
+                <label for="likelihood">Eintrittswahrscheinlichkeit</label>
+                <select id="likelihood" name="likelihood" required aria-label="Eintrittswahrscheinlichkeit">
+                  <option value="hoch">Hoch (High)</option>
+                  <option value="mittel" selected>Medium</option>
+                  <option value="gering">Niedrig (Low)</option>
+                </select>
+                <p class="sla-result priority-p3" id="sla-preview" aria-live="polite"></p>
 
                 <label for="author">Gemeldet von</label>
                 <input id="author" name="author" type="text" maxlength="30" placeholder="Dein Name" aria-label="Name der meldenden Person" />
@@ -621,9 +638,9 @@
               <div>
                 <label for="sort-tickets">Sortieren</label>
                 <select id="sort-tickets" aria-label="Tickets sortieren">
+                  <option value="priority">SLA-Einstufung</option>
                   <option value="newest">Neueste zuerst</option>
                   <option value="oldest">Älteste zuerst</option>
-                  <option value="priority">Dringlichkeit</option>
                 </select>
               </div>
             </div>
@@ -665,11 +682,24 @@
           "Drucker brennt (im übertragenen Sinne)",
           "Sonstiges Chaos",
         ];
-        var PRIORITIES = [
-          { id: "hoch", label: "Angeblich super wichtig", rank: 3 },
-          { id: "mittel", label: "Wäre nett, bald", rank: 2 },
-          { id: "niedrig", label: "Kann warten", rank: 1 },
+        var IMPACT_LEVELS = [
+          { id: "hoch", label: "Hoch" },
+          { id: "mittel", label: "Medium" },
+          { id: "gering", label: "Niedrig" },
         ];
+        var LIKELIHOOD_LEVELS = IMPACT_LEVELS.slice();
+        var SLA_LEVELS = [
+          { id: "p1", label: "P1 – Kritisch (Critical)", rank: 5 },
+          { id: "p2", label: "P2 – Hoch (High)", rank: 4 },
+          { id: "p3", label: "P3 – Medium", rank: 3 },
+          { id: "p4", label: "P4 – Niedrig (Low)", rank: 2 },
+          { id: "p5", label: "P5 – Planung (Planned)", rank: 1 },
+        ];
+        var SLA_MATRIX = {
+          hoch: ["p1", "p2", "p3"],
+          mittel: ["p2", "p3", "p4"],
+          gering: ["p3", "p4", "p5"],
+        };
         var STATUSES = [
           { id: "new", label: "Neu", boardLabel: "Eingegangen" },
           { id: "in_progress", label: "In Bearbeitung", boardLabel: "In Bearbeitung (Kaffeepause)" },
@@ -712,14 +742,28 @@
           var oldNumber = Number(ticket.id);
           var sequence = Number.isFinite(oldNumber) ? oldNumber : index + 1;
           var suffix = id.replace(/[^a-z0-9]/gi, "").slice(-4).toUpperCase().padStart(4, "0");
-          var priority = ticket.priority || ticket.prio;
+          var oldPriority = ticket.priority || ticket.prio;
+          var legacyAssessment = {
+            hoch: { impact: "hoch", likelihood: "hoch" },
+            mittel: { impact: "mittel", likelihood: "mittel" },
+            niedrig: { impact: "gering", likelihood: "gering" },
+          }[oldPriority] || { impact: "mittel", likelihood: "mittel" };
+          var savedImpact = ticket.impact === "sehr_hoch" ? "hoch" : ticket.impact;
+          var savedLikelihood = ticket.likelihood === "sehr_hoch" ? "hoch" : ticket.likelihood;
+          var impact = IMPACT_LEVELS.some(function (item) { return item.id === savedImpact; })
+            ? savedImpact
+            : legacyAssessment.impact;
+          var likelihood = LIKELIHOOD_LEVELS.some(function (item) { return item.id === savedLikelihood; })
+            ? savedLikelihood
+            : legacyAssessment.likelihood;
           return {
             id: id,
             ticketNumber: ticket.ticketNumber || "T-" + String(sequence).padStart(5, "0") + "-" + suffix,
             title: String(ticket.title || "Ohne Betreff"),
             description: String(ticket.description || ticket.desc || ""),
             category: String(ticket.category || CATEGORIES[CATEGORIES.length - 1]),
-            priority: PRIORITIES.some(function (item) { return item.id === priority; }) ? priority : "niedrig",
+            impact: impact,
+            likelihood: likelihood,
             author: String(ticket.author || ticket.reporter || "anonym"),
             status: normalizeStatus(ticket.status),
             createdAt: parseTimestamp(ticket.createdAt || ticket.created),
@@ -788,8 +832,28 @@
           return STATUSES.find(function (status) { return status.id === statusId; }) || STATUSES[0];
         }
 
-        function getPriority(priorityId) {
-          return PRIORITIES.find(function (priority) { return priority.id === priorityId; }) || PRIORITIES[2];
+        function getLevelLabel(levels, id) {
+          var level = levels.find(function (item) { return item.id === id; });
+          return level ? level.label : levels[0].label;
+        }
+
+        function calculateSlaLevel(impact, likelihood) {
+          var probabilityIndex = LIKELIHOOD_LEVELS.findIndex(function (item) { return item.id === likelihood; });
+          var impactRow = SLA_MATRIX[impact] || SLA_MATRIX.mittel;
+          var levelId = impactRow[probabilityIndex < 0 ? 1 : probabilityIndex];
+          return SLA_LEVELS.find(function (item) { return item.id === levelId; }) || SLA_LEVELS[2];
+        }
+
+        function updateSlaPreview() {
+          var impact = document.getElementById("impact").value;
+          var likelihood = document.getElementById("likelihood").value;
+          var level = calculateSlaLevel(impact, likelihood);
+          var preview = document.getElementById("sla-preview");
+          preview.className = "sla-result priority-" + level.id;
+          preview.replaceChildren(
+            document.createTextNode("SLA-Einstufung:"),
+            makeElement("strong", "", level.label),
+          );
         }
 
         function formatDate(timestamp) {
@@ -807,7 +871,10 @@
 
           var tags = makeElement("div", "ticket-tags");
           tags.appendChild(makeElement("span", "tag", ticket.category));
-          tags.appendChild(makeElement("span", "tag priority-" + ticket.priority, getPriority(ticket.priority).label));
+          tags.appendChild(makeElement("span", "tag", "Auswirkung: " + getLevelLabel(IMPACT_LEVELS, ticket.impact)));
+          tags.appendChild(makeElement("span", "tag", "Wahrscheinlichkeit: " + getLevelLabel(LIKELIHOOD_LEVELS, ticket.likelihood)));
+          var slaLevel = calculateSlaLevel(ticket.impact, ticket.likelihood);
+          tags.appendChild(makeElement("span", "tag priority-" + slaLevel.id, "SLA: " + slaLevel.label));
           card.appendChild(tags);
 
           var footer = makeElement("div", "ticket-card-footer");
@@ -878,7 +945,10 @@
             var body = makeElement("div", "column-body");
             body.dataset.status = status.id;
             if (!matching.length) body.appendChild(makeElement("p", "empty-note", EMPTY_NOTES[status.id]));
-            matching.sort(function (a, b) { return parseTimestamp(b.createdAt) - parseTimestamp(a.createdAt); });
+            matching.sort(function (a, b) {
+              return calculateSlaLevel(b.impact, b.likelihood).rank - calculateSlaLevel(a.impact, a.likelihood).rank ||
+                parseTimestamp(b.createdAt) - parseTimestamp(a.createdAt);
+            });
             matching.forEach(function (ticket) {
               var card = createTicketCard(ticket, false);
               card.draggable = true;
@@ -898,12 +968,15 @@
           var status = document.getElementById("filter-status").value;
           var sort = document.getElementById("sort-tickets").value;
           var filtered = tickets.filter(function (ticket) {
-            var text = [ticket.ticketNumber, ticket.title, ticket.description, ticket.author, ticket.category].join(" ").toLocaleLowerCase();
+            var sla = calculateSlaLevel(ticket.impact, ticket.likelihood);
+            var text = [ticket.ticketNumber, ticket.title, ticket.description, ticket.author, ticket.category,
+              getLevelLabel(IMPACT_LEVELS, ticket.impact), getLevelLabel(LIKELIHOOD_LEVELS, ticket.likelihood), sla.label]
+              .join(" ").toLocaleLowerCase();
             return (!query || text.indexOf(query) >= 0) && (!category || ticket.category === category) && (!status || ticket.status === status);
           });
           filtered.sort(function (a, b) {
             if (sort === "oldest") return parseTimestamp(a.createdAt) - parseTimestamp(b.createdAt);
-            if (sort === "priority") return getPriority(b.priority).rank - getPriority(a.priority).rank || parseTimestamp(b.createdAt) - parseTimestamp(a.createdAt);
+            if (sort === "priority") return calculateSlaLevel(b.impact, b.likelihood).rank - calculateSlaLevel(a.impact, a.likelihood).rank || parseTimestamp(b.createdAt) - parseTimestamp(a.createdAt);
             return parseTimestamp(b.createdAt) - parseTimestamp(a.createdAt);
           });
           list.replaceChildren();
@@ -962,7 +1035,8 @@
               title: document.getElementById("title").value.trim(),
               description: document.getElementById("description").value.trim(),
               category: document.getElementById("category").value,
-              priority: document.getElementById("priority").value,
+              impact: document.getElementById("impact").value,
+              likelihood: document.getElementById("likelihood").value,
               author: document.getElementById("author").value.trim() || "anonym",
               status: "new",
               createdAt: Date.now(),
@@ -1022,6 +1096,9 @@
         function initialize() {
           loadTickets();
           document.getElementById("ticket-form").addEventListener("submit", submitTicket);
+          document.getElementById("impact").addEventListener("change", updateSlaPreview);
+          document.getElementById("likelihood").addEventListener("change", updateSlaPreview);
+          updateSlaPreview();
           document.getElementById("board").addEventListener("dragstart", function (event) {
             var card = event.target.closest("[data-ticket-id]");
             if (!card) return;
